@@ -4,7 +4,7 @@ project(mpi_lab)
 set(CMAKE_CXX_STANDARD 20)
 
 
-add_executable(mpi_lab src/main.cpp src/utils.cpp src/utils.h src/TwoDimensionalFloatArray.cpp src/TwoDimensionalFloatArray.h)
+add_executable(mpi_lab src/main.cpp src/utils.cpp src/utils.h src/TwoDimensionalDoubleArray.cpp src/TwoDimensionalDoubleArray.h)
 
 # TODO: remove version from this line or place a lower one
 FIND_PACKAGE(Boost 1.72 COMPONENTS mpi REQUIRED)
