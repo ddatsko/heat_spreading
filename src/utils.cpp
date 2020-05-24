@@ -5,7 +5,7 @@
 #include <Magick++.h>
 
 
-TwoDimensionalDoubleArray read_matrix_from_file(const std::string &filename) {
+void read_matrix_from_file(const std::string &filename, TwoDimensionalDoubleArray& dest) {
     std::ifstream in(filename);
     std::cin.rdbuf(in.rdbuf());
 
@@ -15,11 +15,11 @@ TwoDimensionalDoubleArray read_matrix_from_file(const std::string &filename) {
     for (int i = 0; i < rows; ++i)
         for (int j = 0; j < cols; ++j)
             std::cin >> destination[i][j];
-    return destination;
+    dest = std::move(destination);
 }
 
 
-TwoDimensionalDoubleArray updated_array(TwoDimensionalDoubleArray &old_array, double delta_x, double delta_y,
+void update_array(TwoDimensionalDoubleArray &old_array, double delta_x, double delta_y,
                                         double delta_t, double alpha) {
     TwoDimensionalDoubleArray new_array(old_array.rows, old_array.cols);
     for (int i = 0; i < new_array.rows; ++i) {
@@ -29,17 +29,16 @@ TwoDimensionalDoubleArray updated_array(TwoDimensionalDoubleArray &old_array, do
                 continue;
             }
             new_array[i][j] = old_array[i][j] +
-            delta_t * alpha * (((old_array[i - 1][j] - 2 * old_array[i][j]) / (delta_x * delta_x) +
-                                old_array[i + 1][j]) +
-                               ((old_array[i][j - 1] - 2 * old_array[i][j] + old_array[i][j + 1]) /
-                                (delta_y * delta_y)));
+            delta_t * alpha * ((old_array[i - 1][j] - 2 * old_array[i][j] + old_array[i + 1][j]) / (delta_x * delta_x) +
+                               (old_array[i][j - 1] - 2 * old_array[i][j] + old_array[i][j + 1]) /
+                                (delta_y * delta_y));
         }
     }
-    return new_array;
+    old_array = std::move(new_array);
 }
 
 
-void make_image(TwoDimensionalDoubleArray &array, double blue, double red) {
+void make_image(TwoDimensionalDoubleArray &array, std::string filename, double blue, double red) {
     char size[100];
     sprintf(size, "%dx%d", array.cols, array.rows);
     Magick::Image img(size, "white");
@@ -57,7 +56,7 @@ void make_image(TwoDimensionalDoubleArray &array, double blue, double red) {
             img.pixelColor(j, i, Magick::ColorHSL(color, 1, 0.5));
         }
     }
-    img.write("out.gif");
+    img.write(filename);
 }
 
 

@@ -2,6 +2,8 @@
 #define MPI_LAB_TWODIMENSIONALDOUBLEARRAY_H
 
 
+
+
 class TwoDimensionalDoubleArray {
 private:
     double *data{};
@@ -13,11 +15,13 @@ public:
 
     TwoDimensionalDoubleArray(int rows, int cols);
 
+    TwoDimensionalDoubleArray& operator=(TwoDimensionalDoubleArray &&other) noexcept;
 
     double *operator[](int x);
 
     ~TwoDimensionalDoubleArray();
 };
+
 
 
 #endif //MPI_LAB_TWODIMENSIONALDOUBLEARRAY_H

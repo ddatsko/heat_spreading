@@ -1,3 +1,4 @@
+#include <iostream>
 #include "TwoDimensionalDoubleArray.h"
 
 TwoDimensionalDoubleArray::TwoDimensionalDoubleArray(int rows, int cols): rows{rows}, cols{cols} {
@@ -11,8 +12,19 @@ double *TwoDimensionalDoubleArray::operator[](int x) {
     return &data[x * cols];
 }
 
+
+
 TwoDimensionalDoubleArray::~TwoDimensionalDoubleArray() {
     delete data;
+}
+
+TwoDimensionalDoubleArray &TwoDimensionalDoubleArray::operator=(TwoDimensionalDoubleArray &&other) noexcept {
+    delete this->data;
+    this->data = other.data;
+    other.data = nullptr;
+    this->rows = other.rows;
+    this->cols = other.cols;
+    return *this;
 }
 
 
