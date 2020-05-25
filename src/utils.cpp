@@ -59,4 +59,23 @@ void make_image(TwoDimensionalDoubleArray &array, std::string filename, double b
     img.write(filename);
 }
 
+void append_image(std::list<Magick::Image>& base, TwoDimensionalDoubleArray& array, std::string filename, double blue, double red) {
+    char size[100];
+    sprintf(size, "%dx%d", array.cols, array.rows);
+    Magick::Image img(size, "white");
+    for (int i = 0; i < array.rows; i++) {
+        for (int j = 0; j < array.cols; j++) {
+            double value = array[i][j], color;
+            if (value <= blue) {
+                color = 0.66;
+            } else if (value >= red) {
+                color = 0;
+            } else {
+                color = 0.66 - 0.66 * (value - blue) / (red - blue);
+            }
 
+            img.pixelColor(j, i, Magick::ColorHSL(color, 1, 0.5));
+        }
+    }
+    base.emplace_back(img);
+}

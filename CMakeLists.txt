@@ -18,7 +18,7 @@ TARGET_LINK_LIBRARIES(mpi_lab Boost::mpi)
 # Link Magick++
 add_definitions( -DMAGICKCORE_QUANTUM_DEPTH=16 )
 add_definitions( -DMAGICKCORE_HDRI_ENABLE=0 )
-find_package(ImageMagick REQUIRED COMPONENTS Magick++ MagickWand)
+find_package(ImageMagick REQUIRED COMPONENTS Magick++ MagickWand MagickCore)
 
 include_directories(${ImageMagick_INCLUDE_DIRS})
 target_link_libraries(mpi_lab ${ImageMagick_LIBRARIES})

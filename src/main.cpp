@@ -2,7 +2,7 @@
 #include "TwoDimensionalDoubleArray.h"
 #include <iostream>
 #include <string>
-//#include <boost/serialization/string.hpp>
+#include <Magick++.h>
 #include "utils.h"
 
 namespace mpi = boost::mpi;
@@ -15,12 +15,20 @@ int main() {
 
     int processes = world.size();
 
-    int cycles_per_output = 10000;
-    int cycles = 50000;
+    int cycles_per_output = 50000;
+    int cycles = 1000000;
     double delta_t = 0.01;
     std::string base = "img/image";
 
     std::cout << world.rank() << std::endl;
+
+    delta_t = 0.000001;
+    double delta_x = 0.001;
+    double delta_y = 0.001;
+    double k = 236, ro = 2698, c = 920; // Aluminium
+    double alpha = k / (ro * c);
+
+    std::cout << (delta_t <  std::max<double>(delta_x, delta_y) * std::max<double>(delta_x, delta_y) / (4 * alpha)) << std::endl;
 
 
 
@@ -38,7 +46,8 @@ int main() {
                 int metadata[2] = {0, 0};
                 world.send(i, 0, metadata, 2);
             }
-            throw std::invalid_argument("Too many processes for such the amount of rows");
+            std::cout << "Too many processes for such the amount of rows" << std::endl;
+            return 1;
         }
 
 
@@ -63,6 +72,7 @@ int main() {
 
         int metadata[2] = {1, 1};
         int image_counter = 0;
+        std::list<Magick::Image> animation;
         for (int iteration = 0; iteration < cycles; iteration += cycles_per_output) {
             cur_row = 1; // Dont need to rewrite the first row
 
@@ -71,10 +81,9 @@ int main() {
                 world.recv(i, mpi::any_tag, matrix[cur_row], metadata[0] * metadata[1]);
                 cur_row += metadata[0];
             }
-
-            make_image(matrix, base + std::to_string(image_counter++) + ".gif",  -30, 200);
-
+            append_image(animation, matrix, base + std::to_string(image_counter++) + ".gif",  -30, 250);
         }
+        Magick::writeImages(animation.begin(), animation.end(), "animation.gif");
         return 0;
 
 
@@ -134,7 +143,7 @@ int main() {
                 }
             }
 
-            update_array(array, 0.01, 0.01, 0.00000001, 10);
+            update_array(array, delta_x, delta_y, delta_t, alpha);
 
             if (i % cycles_per_output == 0) {
                 int metadata[2] = {array.rows - 2, array.cols};
