@@ -20,6 +20,10 @@ public:
     double *operator[](int x);
 
     ~TwoDimensionalDoubleArray();
+
+    double min();
+
+    double max();
 };
 
 
