@@ -12,7 +12,7 @@ void read_matrix_from_file(const std::string &filename, TwoDimensionalDoubleArra
 void update_array(TwoDimensionalDoubleArray &old_array, double delta_x, double delta_y,
                   double delta_t, double alpha);
 
-void append_image(std::list<Magick::Image>& base, TwoDimensionalDoubleArray& array, double blue, double red);
+void append_image(std::list<Magick::Image>& base, TwoDimensionalDoubleArray& array, char* size, double blue, double red);
 
 bool check_von_neumann(double delta_t, double delta_x, double delta_y, double alpha);
 

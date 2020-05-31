@@ -16,16 +16,16 @@ int main(int argc, char **argv) {
     Config conf{};
 
     if (world.rank() == 0) {
-        if (argc != 3 and argc != 4) {
+        if (argc != 3 and argc != 4 and argc != 5) {
             std::cout
-                    << "You need to specify exactly 2 or 3 arguments: <name of file with configuration> <name of file with matrix> [<name of_output_animation_file>]"
+                    << "You need to specify exactly 2, 3 or 4 arguments: <name of file with configuration> <name of file with matrix> [<name of_output_animation_file> [<size of animation in pixels>]]"
                     << std::endl;
             finish_counter_processes(world);
             return -3;
         }
 
         std::string config_filename{argv[1]}, matrix_filename{argv[2]};
-        std::string animation_filename = argc == 4 ? argv[3] : "animation.gif";
+        std::string animation_filename = argc >= 4 ? argv[3] : "animation.gif";
 
         if (not boost::filesystem::exists(config_filename) || not boost::filesystem::exists(matrix_filename)) {
             std::cout << "One of specified files does not exist. Exiting..." << std::endl;
@@ -77,6 +77,14 @@ int main(int argc, char **argv) {
             cur_row = new_row + 1;
         }
 
+        // calculate the size of image in animation
+        char size[100];
+        if (argc == 5) {
+            strcpy(size, argv[4]);
+        } else {
+            sprintf(size, "%dx%d", matrix.cols, matrix.rows);
+        }
+
         // Main loop. Wait for calculated data and save image
         int metadata[2];
         std::list<Magick::Image> animation;
@@ -88,7 +96,7 @@ int main(int argc, char **argv) {
                 world.recv(i, mpi::any_tag, matrix[cur_row], metadata[0] * metadata[1]);
                 cur_row += metadata[0];
             }
-            append_image(animation, matrix, blue - 1, red + 1);
+            append_image(animation, matrix, size, blue - 1, red + 1);
         }
 
         // Create the final animation

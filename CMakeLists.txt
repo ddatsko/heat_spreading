@@ -11,8 +11,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
 
 add_executable(mpi_lab src/main.cpp src/utils.cpp src/utils.h src/TwoDimensionalDoubleArray.cpp src/TwoDimensionalDoubleArray.h src/Config.cpp src/Config.h)
 
-# TODO: remove version from this line or place a lower one
-FIND_PACKAGE(Boost 1.73 COMPONENTS mpi filesystem REQUIRED)
+FIND_PACKAGE(Boost COMPONENTS mpi filesystem REQUIRED)
 TARGET_LINK_LIBRARIES(mpi_lab Boost::mpi Boost::filesystem)
 
 

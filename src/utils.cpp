@@ -34,19 +34,18 @@ void update_array(TwoDimensionalDoubleArray &old_array, double delta_x, double d
             new_array[i][j] = old_array[i][j] +
                               delta_t * alpha *
                               ((old_array[i - 1][j] - 2 * old_array[i][j] + old_array[i + 1][j]) / (delta_x * delta_x) +
-                               (old_array[i][j - 1] - 2 * old_array[i][j] + old_array[i][j + 1]) /
-                               (delta_y * delta_y));
+                               (old_array[i][j - 1] - 2 * old_array[i][j] + old_array[i][j + 1]) / (delta_y * delta_y));
         }
     }
     old_array = std::move(new_array);
 }
 
 
-void append_image(std::list<Magick::Image> &base, TwoDimensionalDoubleArray &array, double blue,
+void append_image(std::list<Magick::Image> &base, TwoDimensionalDoubleArray &array, char *size, double blue,
                   double red) {
-    char size[100];
-    sprintf(size, "%dx%d", array.cols, array.rows);
-    Magick::Image img(size, "white");
+    char initial_size[100];
+    sprintf(initial_size, "%dx%d", array.cols, array.rows);
+    Magick::Image img(initial_size, "white");
     for (int i = 0; i < array.rows; i++) {
         for (int j = 0; j < array.cols; j++) {
             double value = array[i][j], color;
@@ -61,14 +60,15 @@ void append_image(std::list<Magick::Image> &base, TwoDimensionalDoubleArray &arr
             img.pixelColor(j, i, Magick::ColorHSL(color, 1, 0.5));
         }
     }
+    img.resize(size);
     base.emplace_back(img);
 }
 
 bool check_von_neumann(double delta_t, double delta_x, double delta_y, double alpha) {
-    return  delta_t <  std::max<double>(delta_x, delta_y) * std::max<double>(delta_x, delta_y) / (4 * alpha);
+    return delta_t < std::max<double>(delta_x, delta_y) * std::max<double>(delta_x, delta_y) / (4 * alpha);
 }
 
-void finish_counter_processes(boost::mpi::communicator& world){
+void finish_counter_processes(boost::mpi::communicator &world) {
     for (int i = 1; i < world.size(); i++) {
         int metadata[2] = {0, 0};
         world.send(i, 0, metadata, 2);
